@@ -1,13 +1,10 @@
-
-import { Button } from "@/components/ui/button"
-
+import DashBoard from "./pages/DashBoard"
 const App = () => {
-  return (
-    <div className="text-center  font-bold font-mono bg-white h-screen   " >App
-    <Button variant="outline">Button</Button>
-    <Button variant="secondary">Cancel</Button>
-    </div>
-  )
-}
+	return (
+		<>
+			<DashBoard />
+		</>
+	);
+};
 
-export default App
+export default App;
