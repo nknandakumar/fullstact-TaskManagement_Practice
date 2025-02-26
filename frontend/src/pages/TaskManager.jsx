@@ -86,6 +86,82 @@ const TaskManager = () => {
             </Button>
           </div>
         </Card>
+        <Card className="mt-4 flex flex-col sm:flex-row items-start justify-between p-4 bg-gray-950">
+         <div className="flex justify-center items-center gap-2">
+         {check ? (
+            <CircleCheckBig
+              className="text-green-500"
+              onClick={() => {
+                setCheck(!check);
+              }}
+            />
+          ) : (
+            <Circle
+              onClick={() => {
+                setCheck(!check);
+              }}
+            />
+          )}
+
+          {/* Task Name */}
+          <div className={` ${check ? "line-through text-gray-200" : ""} `}>
+           service
+          </div>  
+         </div>
+
+          {/* Task Priority */}
+          <div className="space-x-1">
+            <Badge variant="outline">Medium</Badge>
+            <Badge variant="outline">Work</Badge>
+          </div>
+          {/* Task Actions */}
+          <div className="flex space-x-2">
+            <Button className="hover:text-cyan-600 hover:bg-transparent" variant="outline">
+              <FilePenLine />
+            </Button>
+            <Button className="hover:text-red-600 hover:bg-transparent" variant="outline">
+              <Trash />
+            </Button>
+          </div>
+        </Card>
+        <Card className="mt-4 flex flex-col sm:flex-row items-center justify-between p-4 bg-gray-950">
+         <div className="flex justify-center items-center gap-2">
+         {check ? (
+            <CircleCheckBig
+              className="text-green-500"
+              onClick={() => {
+                setCheck(!check);
+              }}
+            />
+          ) : (
+            <Circle
+              onClick={() => {
+                setCheck(!check);
+              }}
+            />
+          )}
+
+          {/* Task Name */}
+          <div className={` ${check ? "line-through text-gray-200" : ""} `}>
+            Car Washing 
+          </div>
+         </div>
+
+          {/* Task Priority */}
+          <div className="space-x-1">
+            <Badge variant="outline">Medium</Badge>
+            <Badge variant="outline">Work</Badge>
+          </div>
+          {/* Task Actions */}
+          <div className="flex space-x-2">
+            <Button className="hover:text-cyan-600 hover:bg-transparent" variant="outline">
+              <FilePenLine />
+            </Button>
+            <Button className="hover:text-red-600 hover:bg-transparent" variant="outline">
+              <Trash />
+            </Button>
+          </div>
+        </Card>
       </div>
     </section>
   );
