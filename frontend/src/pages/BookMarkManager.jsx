@@ -11,7 +11,7 @@ import { Badge } from "../components/ui/badge";
 import Selects from "../components/Selects";
 const BookMarkManager = () => {
 	return (
-		<div className="flex items-center flex-col mt-6 px-4 sm:px-0">
+		<div className=" mt-6 px-4 sm:px-0">
 		 <Card className="bg-gray-950 w-full sm:max-w-3xl">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-3">
