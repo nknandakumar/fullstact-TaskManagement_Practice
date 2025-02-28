@@ -4,6 +4,10 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import db from './config/db.js';
+//Routes
+import todoRoutes from './routes/TodoRoutes.js';
+import bookmarkRoutes from './routes/BookMarkRoutes.js';
+import noteRoutes from './routes/NoteRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,10 +20,10 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 
-app.get('/', (req, res) => {   
-    res.send('Hello World');
-  
- });
+app.use('/api/todos', todoRoutes);
+app.use('/api/bookmarks', bookmarkRoutes);
+app.use('/api/notes', noteRoutes);
+
 
 
 

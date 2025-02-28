@@ -6,7 +6,7 @@ import {
 	CardTitle,
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Plus, Bookmark, FilePenLine, Trash } from "lucide-react";
+import { Plus, Bookmark, FilePenLine, Trash, Bold } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import Selects from "../components/Selects";
 const BookMarkManager = () => {
@@ -100,8 +100,9 @@ const BookMarkManager = () => {
 								https://nk.com
 							</a>
 							<Badge className="" variant="outline">
-								Work
+								Personal
 							</Badge>
+							<p className="text-xs"><span>Created On : </span>19/2/2020</p>
 						</CardContent>
 					</Card>
 

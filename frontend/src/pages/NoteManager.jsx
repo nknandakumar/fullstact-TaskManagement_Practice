@@ -96,7 +96,7 @@ const NoteManager = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="flex flex-col ma sm:flex-row gap-2">
+            <div className="flex flex-col  sm:flex-row gap-2">
               <Input
                 value={newNote.title}
                 onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
@@ -139,7 +139,7 @@ const NoteManager = () => {
       </Card>
 
       {/* Notes Grid */}
-      <div>
+      <div className='mx-4' >
         <h2 className="text-xl font-bold mb-4 text-white">Your Notes</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {notes.length === 0 ? (
