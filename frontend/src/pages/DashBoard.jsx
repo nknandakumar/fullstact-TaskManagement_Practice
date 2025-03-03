@@ -4,7 +4,7 @@ import BookMarkManager from "./BookMarkManager";
 import NoteManager from "./NoteManager";
 import { Button } from "../components/ui/button"
 import { ListTodo, Bookmark, FileText } from 'lucide-react';
-import { useStore } from "../store.js"
+import { useStore } from "../store/store.js"
 
 const DashBoard = () => {
   const {  activeTab ,  setActiveTab} = useStore()
