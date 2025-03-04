@@ -1,12 +1,9 @@
 import {create} from 'zustand';
-
+const tab = localStorage.getItem('activeTab') || 'task';
 export const useStore = create((set) => ({
-
-    activeTab:'task',
-    setActiveTab:(tab)=>set({activeTab:tab}),
-
-    todos:[],
-    setTodos:(todos)=>set({todos}),
-   
-    
+    activeTab: tab ,
+    setActiveTab:(tab)=>{
+         localStorage.setItem('activeTab',tab)
+        set({activeTab:tab})
+    },
 }));

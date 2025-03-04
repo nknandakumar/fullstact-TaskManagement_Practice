@@ -1,168 +1,157 @@
-import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Plus, Pencil, Trash2, X } from 'lucide-react';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { FileText, Plus, Pencil, Trash2 } from "lucide-react";
+import { useNoteStore } from "../store/note.js";
+import { useEffect } from "react";
 
 const NoteManager = () => {
-  // Initialize with some example notes for demonstration
-  const [notes, setNotes] = useState([
-    {
-      id: '1',
-      title: 'Meeting Notes',
-      content: 'Discussed project timelines and assigned tasks for next sprint',
-      category: 'work',
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: '2',
-      title: 'Shopping List',
-      content: 'Milk, eggs, bread, fruits, vegetables',
-      category: 'shopping',
-      updatedAt: new Date().toISOString()
-    }
-  ]);
-  
-  const [newNote, setNewNote] = useState({ 
-    title: '', 
-    content: '', 
-    category: 'personal'
-  });
-  
-  const [editingNote, setEditingNote] = useState(null);
+	const { note, fetchNotes, loading, error } = useNoteStore();
 
-  const addNote = (note) => {
-    const newNoteObj = {
-      ...note,
-      id: Date.now().toString(),
-      updatedAt: new Date().toISOString()
-    };
-    setNotes([newNoteObj, ...notes]);
-  };
+	useEffect(() => {
+		fetchNotes();
+	}, [fetchNotes]);
 
-  const updateNote = (id, content) => {
-    setNotes(notes.map(note => 
-      note.id === id 
-        ? { ...note, content, updatedAt: new Date().toISOString() } 
-        : note
-    ));
-  };
+	console.log(note);
+	return (
+		<div className="max-w-6xl mx-auto flex justify-center items-center flex-col py-6 space-y-6">
+			{/* Add Note Form - at the top */}
+			<Card className="bg-gray-950 ">
+				<CardHeader className="pb-2">
+					<CardTitle className="text-white">Add New Note</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<form className="space-y-3">
+						<div className="flex flex-col  sm:flex-row gap-2">
+							<Input
+								placeholder="Note title"
+								className="flex-1 bg-gray-900 text-white placeholder-gray-400 border-gray-700"
+							/>
+							<Select>
+								<SelectTrigger className="w-full sm:w-32 bg-gray-900 text-white border-gray-700">
+									<SelectValue placeholder="Category" />
+								</SelectTrigger>
+								<SelectContent className="bg-gray-900 text-white border-gray-700">
+									<SelectItem value="personal">Personal</SelectItem>
+									<SelectItem value="work">Work</SelectItem>
+									<SelectItem value="shopping">Shopping</SelectItem>
+									<SelectItem value="health">Health</SelectItem>
+									<SelectItem value="learning">Learning</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+						<div className="flex gap-2">
+							<Textarea
+								placeholder="Note content..."
+								className="flex-1 min-h-24 bg-gray-900 text-white placeholder-gray-400 border-gray-700"
+							/>
+						</div>
+						<Button
+							type="submit"
+							className="p-2 h-fit w-full bg-cyan-600 hover:bg-cyan-500"
+						>
+							<Plus className="w-6 h-6" />
+						</Button>
+					</form>
+				</CardContent>
+			</Card>
 
-  const updateNoteDetails = (id, details) => {
-    setNotes(notes.map(note => 
-      note.id === id 
-        ? { ...note, ...details, updatedAt: new Date().toISOString() } 
-        : note
-    ));
-  };
+			{/* Notes Grid */}
+			<div className="mx-4">
+				<h2 className="text-xl font-bold mb-4 text-white">Your Notes</h2>
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+					{error && (
+						<div className="text-black-500 mt-4 rounded-lg flex-1 bg-red-400 py-2 px-6 text-center">
+							{error}
+						</div>
+					)}
 
-  const deleteNote = (id) => {
-    setNotes(notes.filter(note => note.id !== id));
-  };
+					{loading ? (
+						<div>Loading....</div>
+					) : (
+						note.map((note) => {
+							const { id, title, content, category, created_date } = note;
+							return (
+								<Card
+									key={id}
+									className="bg-gray-900 hover:shadow-md transition-shadow"
+								>
+									<CardContent className="p-4">
+										<div className="flex items-center justify-between mb-2">
+											<div className="flex items-center gap-2">
+												<FileText className="w-5 h-5 text-cyan-500" />
+												<h3 className="font-medium text-white">{title}</h3>
+											</div>
+											<div className="flex gap-1">
+												<Button
+													variant="ghost"
+													size="icon"
+													className="text-gray-400 hover:text-cyan-500 hover:bg-transparent"
+												>
+													<Pencil className="w-5 h-5" />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="text-gray-400 hover:text-red-500 hover:bg-transparent"
+												>
+													<Trash2 className="w-5 h-5" />
+												</Button>
+											</div>
+										</div>
+										<Textarea
+											value={content}
+											className="w-full mt-2 text-sm text-gray-300 bg-gray-800 border-gray-700"
+											rows={4}
+										/>
+										<div className="mt-2 flex items-center justify-between">
+											<Badge
+												variant="outline"
+												className="text-cyan-400 border-cyan-800"
+											>
+												{category}
+											</Badge>
+											<p className="text-xs text-gray-400">
+												Last updated:{" "}
+												{created_date
+													? created_date.toLocaleString()
+													: "N/A"}
+											</p>
+										</div>
+									</CardContent>
+								</Card>
+							);
+						})
+					)}
+				</div>
+			</div>
+		</div>
+	);
+};
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!newNote.title.trim() || !newNote.content.trim()) return;
-    
-    addNote(newNote);
-    setNewNote({ 
-      title: '', 
-      content: '', 
-      category: 'personal'
-    });
-  };
+export default NoteManager;
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    if (!editingNote) return;
-    
-    updateNoteDetails(editingNote.id, {
-      title: editingNote.title,
-      content: editingNote.content,
-      category: editingNote.category,
-    });
-    setEditingNote(null);
-  };
-
-  return (
-    <div className="max-w-6xl mx-auto flex justify-center items-center flex-col py-6 space-y-6">
-      {/* Add Note Form - at the top */}
-      <Card className="bg-gray-950 ">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-white">Add New Note</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="flex flex-col  sm:flex-row gap-2">
-              <Input
-                value={newNote.title}
-                onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
-                placeholder="Note title"
-                className="flex-1 bg-gray-900 text-white placeholder-gray-400 border-gray-700"
-              />
-              <Select 
-                value={newNote.category}
-                onValueChange={(value) => setNewNote({ ...newNote, category: value })}
-              >
-                <SelectTrigger className="w-full sm:w-32 bg-gray-900 text-white border-gray-700">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-900 text-white border-gray-700">
-                  <SelectItem value="personal">Personal</SelectItem>
-                  <SelectItem value="work">Work</SelectItem>
-                  <SelectItem value="shopping">Shopping</SelectItem>
-                  <SelectItem value="health">Health</SelectItem>
-                  <SelectItem value="learning">Learning</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2">
-              <Textarea
-                value={newNote.content}
-                onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-                placeholder="Note content..."
-                className="flex-1 min-h-24 bg-gray-900 text-white placeholder-gray-400 border-gray-700"
-              />
-            
-            </div>
-            <Button
-                type="submit"
-                className="p-2 h-fit w-full bg-cyan-600 hover:bg-cyan-500"
-              >
-                <Plus className="w-6 h-6" />
-              </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Notes Grid */}
-      <div className='mx-4' >
-        <h2 className="text-xl font-bold mb-4 text-white">Your Notes</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {notes.length === 0 ? (
-            <Card className="col-span-full bg-gray-900 text-gray-400">
-              <CardContent className="p-8 text-center">
-                No notes yet. Add your first note above!
-              </CardContent>
-            </Card>
-          ) : (
-            notes.map((note) => (
-              <Card key={note.id} className="bg-gray-900 hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  {editingNote?.id === note.id ? (
-                    <form onSubmit={handleUpdate} className="space-y-2">
+/**
+   {editingNote?.id === note.id ? (
+                    <form className="space-y-2">
                       <Input
                         value={editingNote.title}
-                        onChange={(e) => setEditingNote({ ...editingNote, title: e.target.value })}
+                        
                         className="w-full bg-gray-800 text-white border-gray-700"
                         placeholder="Title"
                       />
                       <Select 
                         value={editingNote.category}
-                        onValueChange={(value) => setEditingNote({ ...editingNote, category: value })}
+                       
                       >
                         <SelectTrigger className="w-full bg-gray-800 text-white border-gray-700">
                           <SelectValue placeholder="Category" />
@@ -199,56 +188,5 @@ const NoteManager = () => {
                         </Button>
                       </div>
                     </form>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-cyan-500" />
-                          <h3 className="font-medium text-white">{note.title}</h3>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            onClick={() => setEditingNote(note)}
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-cyan-500 hover:bg-transparent"
-                          >
-                            <Pencil className="w-5 h-5" />
-                          </Button>
-                          <Button
-                            onClick={() => deleteNote(note.id)}
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-red-500 hover:bg-transparent"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </Button>
-                        </div>
-                      </div>
-                      <Textarea
-                        value={note.content}
-                        onChange={(e) => updateNote(note.id, e.target.value)}
-                        className="w-full mt-2 text-sm text-gray-300 bg-gray-800 border-gray-700"
-                        rows={4}
-                      />
-                      <div className="mt-2 flex items-center justify-between">
-                        <Badge variant="outline" className="text-cyan-400 border-cyan-800">
-                          {note.category}
-                        </Badge>
-                        <p className="text-xs text-gray-400">
-                          Last updated: {new Date(note.updatedAt).toLocaleString()}
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default NoteManager;
+                  ) 
+ */
