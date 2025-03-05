@@ -15,13 +15,17 @@ import { useNoteStore } from "../store/note.js";
 import { useEffect } from "react";
 
 const NoteManager = () => {
-	const { note, fetchNotes, loading, error } = useNoteStore();
+	const { note, fetchNotes, loading, error,loaded } = useNoteStore();
 
 	useEffect(() => {
-		fetchNotes();
-	}, [fetchNotes]);
 
-	console.log(note);
+	console.log('Component mounted, loaded state:', loaded);
+    if (!loaded) {
+		fetchNotes();
+    }
+	}, [fetchNotes,loaded]);
+
+	
 	return (
 		<div className="max-w-6xl mx-auto flex justify-center items-center flex-col py-6 space-y-6">
 			{/* Add Note Form - at the top */}

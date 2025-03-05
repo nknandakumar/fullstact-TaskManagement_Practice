@@ -12,14 +12,17 @@ import { Badge } from "../components/ui/badge";
 import Selects from "../components/Selects";
 import { useBookMarkStore } from "../store/bookmark.js";
 const BookMarkManager = () => {
-	const { bookmark, fetchBookMarks, loading, error } = useBookMarkStore();
+	const { bookmark, fetchBookMarks, loading, error, loaded } = useBookMarkStore();
 	useEffect(() => {
-		fetchBookMarks();
-	}, [fetchBookMarks]);
-	console.log(bookmark);
+		console.log('Component mounted, loaded state:', loaded);
+		if (!loaded) {
+			fetchBookMarks();
+		}
+	}, [fetchBookMarks,loaded]);
+
 	return (
-		<div className=" mt-6 px-4 sm:px-0">
-			<Card className="bg-gray-950 w-full sm:max-w-3xl">
+		<div className=" mt-6 px-4 flex flex-col items-center justify-center sm:px-0">
+			<Card className="bg-gray-950 w-full   sm:max-w-3xl">
 				<CardContent className="p-4">
 					<div className="flex flex-col sm:flex-row gap-3">
 						<Input

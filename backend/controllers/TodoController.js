@@ -2,7 +2,7 @@ import db from "../config/db.js";
 db.connect();
 export const getTodos = async (req, res) => {
     try {
-        const response = await db.query("SELECT * FROM todo ORDER BY created_date DESC");
+        const response = await db.query("SELECT * FROM todo ORDER BY id desc");
         res.status(200).json(response.rows);
     } catch (error) {
         res.status(500).json({ error: "Something went wrong. Please try again" });
@@ -10,9 +10,11 @@ export const getTodos = async (req, res) => {
 };
 export const createTodo = async (req, res) => {
     const {task , priority, category} = req.body;
+    console.log(req.body);
     try {
         const response = await db.query("INSERT INTO todo (task,  priority_category,  type_category ) VALUES ($1, $2, $3) RETURNING *", [task, priority, category]);
         res.status(201).json(response.rows[0]);
+
     } catch (error) {
         res.status(500).json({ error: "Something went wrong. Please try again" });
     }
