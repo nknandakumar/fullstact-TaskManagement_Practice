@@ -24,8 +24,14 @@ import {
 	CircleCheckBig,
 	Calendar,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "../components/ui/badge";
+
+import {
+	Dialog,
+	DialogContent,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 const TaskManager = () => {
 	const {
@@ -36,15 +42,28 @@ const TaskManager = () => {
 		loaded,
 		formData,
 		setFormData,
-    addTodo,
+		addTodo,
+		updateTodo,
 	} = useTodoStore();
 
+	const [editingId, setEditingId] = useState(null);
+	const editTodo = todos.find((todo) => todo.id === editingId);
+
 	useEffect(() => {
-    console.log("Component mounted, loaded state:", loaded);
+		console.log("Component mounted, loaded state:", loaded);
 		if (!loaded) {
 			fetchTodos();
 		}
 	}, [fetchTodos, loaded]);
+
+	const handleEditSubmit = (e) => {
+		e.preventDefault();
+		if (editTodo) {
+			updateTodo(editTodo.id);
+			setEditingId(null);
+			setFormData({ task: '', priority: '', category: '' });
+		}
+	};
 
 	return (
 		<section className="flex items-center flex-col mt-6 px-4 sm:px-0">
@@ -57,14 +76,18 @@ const TaskManager = () => {
 						<Input
 							placeholder="Add Todo"
 							value={formData.task || ""}
-							onChange={(e) => setFormData({ ...formData, task: e.target.value })}
+							onChange={(e) =>
+								setFormData({ ...formData, task: e.target.value })
+							}
 							className="bg-gray-900 flex-1"
 							required
 						/>
 
 						{/* Task Priority */}
 						<Select
-							onValueChange={(value) => setFormData({ ...formData, priority: value })}
+							onValueChange={(value) =>
+								setFormData({ ...formData, priority: value })
+							}
 						>
 							<SelectTrigger className="w-full sm:w-[110px]">
 								<SelectValue placeholder="Priority" />
@@ -78,7 +101,9 @@ const TaskManager = () => {
 
 						{/* Task Category */}
 						<Select
-							onValueChange={(value) => setFormData({ ...formData, category: value })}
+							onValueChange={(value) =>
+								setFormData({ ...formData, category: value })
+							}
 						>
 							<SelectTrigger className="w-full sm:w-[110px]">
 								<SelectValue placeholder="Category" />
@@ -123,10 +148,7 @@ const TaskManager = () => {
 									<div className="flex flex-col space-y-2 w-full sm:w-auto">
 										{/* Task Title with Checkbox */}
 										<div className="flex items-center justify-between w-full">
-											<div
-												className="flex items-center gap-2 cursor-pointer"
-												
-											>
+											<div className="flex items-center gap-2 cursor-pointer">
 												{completed ? (
 													<CircleCheckBig className="text-green-500" />
 												) : (
@@ -147,7 +169,7 @@ const TaskManager = () => {
 													className="hover:text-cyan-600 hover:bg-transparent"
 													variant="outline"
 													size="sm"
-												
+													onClick={() => setEditingId(id)}
 												>
 													<FilePenLine size={18} />
 												</Button>
@@ -155,7 +177,6 @@ const TaskManager = () => {
 													className="hover:text-red-600 hover:bg-transparent"
 													variant="outline"
 													size="sm"
-										
 												>
 													<Trash size={18} />
 												</Button>
@@ -183,16 +204,15 @@ const TaskManager = () => {
 										<Button
 											className="hover:text-cyan-600 hover:bg-transparent"
 											variant="outline"
-									
+											onClick={() => setEditingId(id)}
 										>
-											<FilePenLine />
+											<FilePenLine size={18} />
 										</Button>
 										<Button
 											className="hover:text-red-600 hover:bg-transparent"
 											variant="outline"
-									
 										>
-											<Trash />
+											<Trash size={18} />
 										</Button>
 									</div>
 								</div>
@@ -201,6 +221,59 @@ const TaskManager = () => {
 					})
 				)}
 			</div>
+
+			{editingId && (
+				<Dialog open={!!editingId} onOpenChange={(open) => setEditingId(open ? editingId : null)}>
+					<DialogContent>
+						<form onSubmit={handleEditSubmit} className="flex flex-col sm:flex-row m-4 gap-2">
+							<Input
+								value={editTodo?.task || ""}
+								onChange={(e) =>
+									setFormData({ ...formData, task: e.target.value })
+								}
+								className="bg-gray-900 flex-1"
+		
+							/>
+
+							{/* Task Priority */}
+							<Select
+								onValueChange={(value) =>
+									setFormData({ ...formData, priority: value })
+								}
+							>
+								<SelectTrigger className="w-full sm:w-[110px]">
+									<SelectValue placeholder="Priority" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="low">Low</SelectItem>
+									<SelectItem value="mid">Mid</SelectItem>
+									<SelectItem value="high">High</SelectItem>
+								</SelectContent>
+							</Select>
+
+							{/* Task Category */}
+							<Select
+								onValueChange={(value) =>
+									setFormData({ ...formData, category: value })
+								}
+							>
+								<SelectTrigger className="w-full sm:w-[110px]">
+									<SelectValue placeholder="Category" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="personal">Personal</SelectItem>
+									<SelectItem value="work">Work</SelectItem>
+									<SelectItem value="other">Other</SelectItem>
+								</SelectContent>
+							</Select>
+
+							<Button type="submit" variant="outline">
+								<Plus />
+							</Button>
+						</form>
+					</DialogContent>
+				</Dialog>
+			)}
 		</section>
 	);
 };

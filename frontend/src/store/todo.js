@@ -68,5 +68,86 @@ export const useTodoStore = create((set, get) => ({
         } finally {
             set({ loading: false });
         }
+    },
+
+    // Update Todo
+    updateTodo: async (id) => {
+        const todo = get().formData;
+        set({ loading: true });
+
+        try {
+            const { data } = await axios.put(`${BASE_URL}/api/todos/${id}`, todo);
+            set({ todos: get().todos.map((todo) => (todo.id === id ? data : todo)), error: null });
+        } catch (err) {
+            console.log(err);
+            set({ error: "Something went wrong" });
+        } finally {
+            set({ loading: false });
+        }
     }
 }));
+
+
+
+/**
+
+ // Create - Add a new bookmark
+  addBookMark: async () => {
+    const { formData } = get();
+    
+    // Start loading
+    set({ loading: true, error: null });
+    
+    try {
+      // Prepare new bookmark data
+  
+      
+      // Send to API
+      const { data } = await axios.post(`${BASE_URL}/api/bookmarks`, formData);
+      
+      // Update state with new bookmark
+      set((state) => ({ 
+        bookmark: [...state.bookmark, data],
+        error: null 
+      }));
+      
+      // Reset form
+      get().resetForm();
+      
+    } catch (err) {
+      console.log(err);
+      set({ error: "Failed to add bookmark" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+
+
+
+
+ // Delete - Remove a bookmark
+  deleteBookMark: async (id) => {
+    // Start loading
+    set({ loading: true, error: null });
+    
+    try {
+      // Send delete request to API
+      await axios.delete(`${BASE_URL}/api/bookmarks/${id}`);
+      
+      // Update state by removing deleted bookmark
+      set((state) => ({
+        bookmark: state.bookmark.filter(b => b.id !== id),
+        error: null
+      }));
+      
+    } catch (err) {
+      console.log(err);
+      set({ error: "Failed to delete bookmark" });
+    } finally {
+      set({ loading: false });
+    }
+  }
+}));
+
+ */
