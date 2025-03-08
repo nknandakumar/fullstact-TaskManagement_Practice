@@ -30,7 +30,7 @@ import { Badge } from "../components/ui/badge";
 import {
 	Dialog,
 	DialogContent,
-	DialogTrigger,
+
 } from "@/components/ui/dialog";
 
 const TaskManager = () => {

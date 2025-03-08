@@ -20,11 +20,21 @@ export const useBookMarkStore = create((set, get) => ({
     formData: { ...state.formData, ...formData } 
   })),
   
+//update Form
+updateData: {
+  title: "",
+  url: "",
+  category: "personal"  // Make sure it's lowercase to match select values
+},
+setUpdateData: (updateData) => set((state) => ({ 
+  updateData: { ...state.updateData, ...updateData } 
+})),
+
   resetForm: () => set({
     formData: {
       title: "",
       url: "",
-      category: "personal"  // Make sure it's lowercase to match select values
+      category: ""  // Make sure it's lowercase to match select values
     }
   }),
   
@@ -39,16 +49,30 @@ export const useBookMarkStore = create((set, get) => ({
     
     try {
       const { data } = await axios.get(`${BASE_URL}/api/bookmarks`);
-      // Sort bookmarks by created date (newest first)
-      const sortedBookmarks = data.sort((a, b) => 
-        new Date(b.created_date) - new Date(a.created_date)
-      );
-      set({ bookmark: sortedBookmarks, error: null, loaded: true });
+      set({ bookmark: data, error: null, loaded: true });
     } catch (err) {
       console.error("Error fetching bookmarks:", err);
       set({ 
         error: err.response?.data?.message || "Failed to fetch bookmarks", 
         bookmark: [] 
+      });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  fetchBookMark: async (id) => {    
+    set({ loading: true, error: null });
+    
+    try {
+      const { data } = await axios.get(`${BASE_URL}/api/bookmarks/${id}`);
+      set({ updateData :data });
+
+    } catch (err) {
+      console.error("Error fetching bookmarks:", err);
+      set({ 
+        error: err.response?.data?.message || "Failed to fetch bookmarks", 
+      
       });
     } finally {
       set({ loading: false });
@@ -86,6 +110,22 @@ export const useBookMarkStore = create((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+
+  //update 
+  updateBookMark: async (id)=>{
+      const {updateData , bookmark} = get()
+      set({loading:true})
+      try {
+        const {data} = await axios.put(`${BASE_URL}/api/bookmarks/${id}`,updateData);
+        set({bookmark:bookmark.map((b)=> (b.id === id ? data : b )),    updateData: { title: "", url: "", category: "personal" }})
+     
+      } catch (err) {
+        console.log(err,"Error in update")
+        set({error:"Failed to Update Bookmark"})
+      }finally{
+        set({loading:false, error:null})
+      }
   },
   
   // Delete Bookmark

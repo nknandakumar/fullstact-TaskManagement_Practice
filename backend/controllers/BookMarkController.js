@@ -8,6 +8,18 @@ export const getBookMarks = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again" });
     }
 };
+
+export const getBookMark = async (req,res)=>{
+    const {id} = req.params;
+    console.log(id);
+    
+    try {
+        const response = await db.query("SELECT * FROM bookmark WHERE id = $1",[id])
+        res.status(201).json(response.rows[0])
+    } catch (error) {
+        res.status(500).json({ error: "Something went wrong. Please try again" });
+    }
+}
 export const createBookMark = async (req, res) => {
     const {title, url, category} = req.body;
     try {
