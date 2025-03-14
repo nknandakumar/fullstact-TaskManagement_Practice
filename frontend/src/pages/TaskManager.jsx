@@ -27,11 +27,7 @@ import {
 import { useState, useEffect } from "react";
 import { Badge } from "../components/ui/badge";
 
-import {
-	Dialog,
-	DialogContent,
-
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const TaskManager = () => {
 	const {
@@ -42,12 +38,16 @@ const TaskManager = () => {
 		loaded,
 		formData,
 		setFormData,
+		toggleTodo,
 		addTodo,
+		ModifyTodo,
 		updateTodo,
+		deleteTodo,
+		updateData,
+		setUpdateData,
 	} = useTodoStore();
 
 	const [editingId, setEditingId] = useState(null);
-	const editTodo = todos.find((todo) => todo.id === editingId);
 
 	useEffect(() => {
 		console.log("Component mounted, loaded state:", loaded);
@@ -56,13 +56,23 @@ const TaskManager = () => {
 		}
 	}, [fetchTodos, loaded]);
 
+	// Add this useEffect to track changes to updateData
+	useEffect(() => {
+		if (editingId) {
+			console.log("updateData changed:", updateData);
+		}
+	}, [updateData, editingId]);
+
+	const handleUpdate = (id) => {
+		setEditingId(id);
+		ModifyTodo(id);
+		// The console.log is now in the useEffect above to correctly see the updated state
+	};
+
 	const handleEditSubmit = (e) => {
 		e.preventDefault();
-		if (editTodo) {
-			updateTodo(editTodo.id);
-			setEditingId(null);
-			setFormData({ task: '', priority: '', category: '' });
-		}
+		updateTodo(editingId);
+		setEditingId(null);
 	};
 
 	return (
@@ -88,6 +98,7 @@ const TaskManager = () => {
 							onValueChange={(value) =>
 								setFormData({ ...formData, priority: value })
 							}
+							value={formData.priority}
 						>
 							<SelectTrigger className="w-full sm:w-[110px]">
 								<SelectValue placeholder="Priority" />
@@ -104,6 +115,7 @@ const TaskManager = () => {
 							onValueChange={(value) =>
 								setFormData({ ...formData, category: value })
 							}
+							value={formData.category}
 						>
 							<SelectTrigger className="w-full sm:w-[110px]">
 								<SelectValue placeholder="Category" />
@@ -132,7 +144,7 @@ const TaskManager = () => {
 				{loading ? (
 					<div>Loading...</div>
 				) : (
-					todos.map((todo) => {
+					todos.map((todo,index) => {
 						const {
 							id,
 							task,
@@ -142,7 +154,7 @@ const TaskManager = () => {
 							created_date,
 						} = todo;
 						return (
-							<Card key={id} className="mt-4 p-4 bg-gray-950">
+							<Card key={index} className="mt-4 p-4 bg-gray-950">
 								<div className="flex flex-col sm:flex-row items-start justify-between w-full gap-3">
 									{/* Task Content */}
 									<div className="flex flex-col space-y-2 w-full sm:w-auto">
@@ -150,10 +162,17 @@ const TaskManager = () => {
 										<div className="flex items-center justify-between w-full">
 											<div className="flex items-center gap-2 cursor-pointer">
 												{completed ? (
-													<CircleCheckBig className="text-green-500" />
+													<CircleCheckBig
+														onClick={() => toggleTodo(id, !completed)}
+														className="text-green-500"
+													/>
 												) : (
-													<Circle className="text-gray-400" />
+													<Circle
+														onClick={() => toggleTodo(id, !completed)}
+														className="text-gray-400"
+													/>
 												)}
+
 												<div
 													className={`${
 														completed ? "line-through text-gray-200" : ""
@@ -169,11 +188,12 @@ const TaskManager = () => {
 													className="hover:text-cyan-600 hover:bg-transparent"
 													variant="outline"
 													size="sm"
-													onClick={() => setEditingId(id)}
+													onClick={() => handleUpdate(id)}
 												>
 													<FilePenLine size={18} />
 												</Button>
 												<Button
+													onClick={() => deleteTodo(id)}
 													className="hover:text-red-600 hover:bg-transparent"
 													variant="outline"
 													size="sm"
@@ -187,8 +207,8 @@ const TaskManager = () => {
 										<div className="flex items-center mt-2 sm:gap-10 justify-between">
 											{/* Tags */}
 											<div className="flex space-x-1">
-												<Badge variant="outline">{priority_category}</Badge>
-												<Badge variant="outline">{type_category}</Badge>
+												<Badge key={`${id}-priority`} variant="outline">{priority_category}</Badge>
+												<Badge key={`${id}-type`} variant="outline">{type_category}</Badge>
 											</div>
 
 											{/* Date */}
@@ -204,11 +224,12 @@ const TaskManager = () => {
 										<Button
 											className="hover:text-cyan-600 hover:bg-transparent"
 											variant="outline"
-											onClick={() => setEditingId(id)}
+											onClick={() => handleUpdate(id)}
 										>
 											<FilePenLine size={18} />
 										</Button>
 										<Button
+											onClick={() => deleteTodo(id)}
 											className="hover:text-red-600 hover:bg-transparent"
 											variant="outline"
 										>
@@ -223,22 +244,35 @@ const TaskManager = () => {
 			</div>
 
 			{editingId && (
-				<Dialog open={!!editingId} onOpenChange={(open) => setEditingId(open ? editingId : null)}>
+				<Dialog
+					open={!!editingId}
+					onOpenChange={(open) => {
+						if (!open) setEditingId(null);
+					}}
+				>
 					<DialogContent>
-						<form onSubmit={handleEditSubmit} className="flex flex-col sm:flex-row m-4 gap-2">
+						<DialogTitle>Edit Todo</DialogTitle>
+						<DialogDescription>
+							Make changes to your todo item below.
+						</DialogDescription>
+						<form
+							onSubmit={handleEditSubmit}
+							className="flex flex-col sm:flex-row m-4 gap-2"
+						>
 							<Input
-								value={editTodo?.task || ""}
+								value={updateData.task || ""}
 								onChange={(e) =>
-									setFormData({ ...formData, task: e.target.value })
+									setUpdateData({ ...updateData, task: e.target.value })
 								}
 								className="bg-gray-900 flex-1"
-		
+								required
 							/>
 
 							{/* Task Priority */}
 							<Select
+								value={updateData.priority || ""}
 								onValueChange={(value) =>
-									setFormData({ ...formData, priority: value })
+									setUpdateData({ ...updateData, priority: value })
 								}
 							>
 								<SelectTrigger className="w-full sm:w-[110px]">
@@ -253,8 +287,9 @@ const TaskManager = () => {
 
 							{/* Task Category */}
 							<Select
+								value={updateData.value || ""}
 								onValueChange={(value) =>
-									setFormData({ ...formData, category: value })
+									setUpdateData({ ...updateData, category: value })
 								}
 							>
 								<SelectTrigger className="w-full sm:w-[110px]">

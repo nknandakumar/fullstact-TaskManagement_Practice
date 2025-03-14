@@ -118,7 +118,8 @@ setUpdateData: (updateData) => set((state) => ({
       set({loading:true})
       try {
         const {data} = await axios.put(`${BASE_URL}/api/bookmarks/${id}`,updateData);
-        set({bookmark:bookmark.map((b)=> (b.id === id ? data : b )),    updateData: { title: "", url: "", category: "personal" }})
+        set({bookmark:bookmark.map((b)=> (b.id === id ? data : b )),  
+        updateData: { title: "", url: "", category: "personal" }})
      
       } catch (err) {
         console.log(err,"Error in update")

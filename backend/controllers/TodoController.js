@@ -8,6 +8,13 @@ export const getTodos = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again" });
     }
 };
+
+//Toggle Todo
+export const toggleTodo = async (req,res)=>{
+  const {id,completed} = req.body 
+  await db.query("UPDATE todo SET completed = $1 WHERE id = $2 ", [completed,id]);
+  res.json({ message: "Todo updated" });
+}
 export const createTodo = async (req, res) => {
     const {task , priority, category} = req.body;
     console.log(req.body);
@@ -20,8 +27,10 @@ export const createTodo = async (req, res) => {
     }
 };
 export const updateTodo = async (req, res) => {
+    console.log("update method ")
     const id = req.params.id;
     const {task , priority, category} = req.body;
+    console.log(req.body)
     try {
         const response = await db.query("UPDATE todo SET task = $1, priority_category = $2, type_category = $3 WHERE id = $4 RETURNING *", [task, priority, category, id]);
         res.status(200).json(response.rows[0]);
